@@ -1,0 +1,109 @@
+/* Login.css */
+
+.login-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  margin-top: 50px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2,
+.login-container h3 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.login-container input,
+.login-container select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.login-container button {
+  padding: 10px;
+  background-color: #3498db;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+  background-color: #2980b9;
+}
+
+.toggle-button {
+  background-color: transparent;
+  border: none;
+  color: #2980b9;
+  cursor: pointer;
+  text-align: center;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.login-container form label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.login-container form input,
+.login-container form select {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  margin: 4px 0 12px;
+  position: static;
+}
+
+.login-container form button {
+  width: 100%;
+}
+
+/* container de chaque ligne distributeur */
+.distributeur-item {
+  display: flex;
+  align-items: center; /* pour permettre les décalages indépendants */
+  gap: 0.5rem;
+  padding: 8px 12px;
+  border: 1px solid #e1e8f2;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+/* radio : décalé fortement vers le bas */
+.distributeur-item input[type="radio"] {
+  margin-top: -30px;
+  flex-shrink: 0;
+}
+
+/* texte : légèrement remonté pour rester aligné */
+.distributeur-item span {
+  font-size: 16px;
+  line-height: 1.2;
+  margin-top: -4px;
+}
+
+/* état sélectionné */
+.distributeur-item.selected {
+  background-color: #eef6ff;
+  border-color: #a8cfff;
+}

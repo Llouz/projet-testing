@@ -1,0 +1,42 @@
+.livreur-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.livreur-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.livreur-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.livreur-nav button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.livreur-nav button:hover {
+  background-color: #2980b9;
+}
+
+.livreur-content {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}

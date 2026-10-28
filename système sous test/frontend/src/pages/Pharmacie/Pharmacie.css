@@ -1,0 +1,81 @@
+.pharmacie-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.pharmacie-container h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.pharmacie-container nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pharmacie-container nav button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pharmacie-container nav button:hover {
+  background-color: #2980b9;
+}
+
+.pharmacie-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.pharmacie-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+.pharmacie-container input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.pharmacie-container button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pharmacie-container button:hover {
+  background-color: #2980b9;
+}
+
+.pharmacie-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.pharmacie-container li {
+  background-color: #f2f2f2;
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 6px;
+}
