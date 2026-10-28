@@ -1,0 +1,195 @@
+[
+  {
+    "scenario": "11",
+    "version": "multi-v3",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "termine",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "Modification du champ de requête de distributeur_id à fournisseur_id dans le modèle CommandeRequest et dans la route commander.",
+          "comportement_teste": "Le test crée un objet CommandeRequest en passant le paramètre distributeur_id ; le modèle requiert maintenant fournisseur_id, provoquant une ValidationError de pydantic avant même d'atteindre la logique métier.",
+          "regle_necessaire": "Règle métier : « une commande validée dont la réception est confirmée passe au statut reçue et met à jour le stock. Une modification de nom d'une fonction ne change pas à elle seule son comportement. »",
+          "preuve_regle": null,
+          "informations_manquantes": [
+            "La règle métier ne mentionne pas explicitement le nom du champ requis pour la requête, mais indique qu'une modification de nom ne change pas le comportement. Elle n'exclut donc pas que le test devrait fournir le champ actuel fournisseur_id."
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 1,
+        "duree_totale_secondes": 1.914,
+        "erreurs_http": {}
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "decision": "repair_test",
+          "explication": "La modification d’interface approuvée a renommé le champ de requête de *distributeur_id* à *fournisseur_id*. Le code a correctement été mis à jour, mais les tests n’ont pas suivi cette évolution, provoquant une erreur de validation Pydantic. Il s’agit donc d’une mise à jour de test, pas d’un bug métier ni d’une modification de logique applicative.",
+          "preuve_decision": "Évolution d’interface approuvée : le champ de requête distributeur_id est renommé fournisseur_id ; le rôle et les autres règles restent inchangés.",
+          "correction_test": "```python\ndef demande(**changes):\n    valeurs = {'medicament_id': 1, 'quantite': 3, 'fournisseur_id': 2}\n    valeurs.update(changes)\n    return CommandeRequest(**valeurs)\n```",
+          "risques": [
+            "Assure‑vous que tous les autres tests utilisant CommandeRequest sont mis à jour de la même façon."
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 6.875,
+        "erreurs_http": {
+          "429": 1
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": {
+          "avis": "needs_review",
+          "motifs": [
+            "Les tests utilisent encore le champ `distributeur_id` alors que l'interface a été mise à jour pour `fournisseur_id`. Cela provoque une erreur de validation Pydantic et fait échouer les tests sans que la logique métier ne soit affectée."
+          ],
+          "assertions_a_revoir": [],
+          "questions": [
+            "Existe-t-il d’autres tests ou parties de l’application qui utilisent encore `distributeur_id` et doivent être mis à jour pour correspondre à l’interface renvoyée ?"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 36.035,
+        "erreurs_http": {
+          "429": 1
+        }
+      }
+    ],
+    "decision_finale": {
+      "decision_proposee": "repair_test",
+      "avis_verificateur": "needs_review",
+      "decision_effective": "needs_review",
+      "validation_humaine_requise": true
+    },
+    "controle_preuve_decision": {
+      "citation_presente": true,
+      "note": "Présence textuelle seulement ; pertinence et exactitude à vérifier humainement."
+    }
+  },
+  {
+    "scenario": "12",
+    "version": "multi-v3",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "erreur",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "la fonction voir_commandes renvoie toutes les commandes au lieu de filtrer par pharmacie_id",
+          "comportement_teste": "le test attend que seules les commandes de la pharmacie 1 soient retournées, mais la fonction retourne 2 commandes",
+          "regle_necessaire": "une pharmacie ne peut consulter que ses propres commandes",
+          "preuve_regle": null,
+          "informations_manquantes": [
+            "Aucune modification supplémentaire à la règle métier n’est requise pour expliquer l’échec"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 1,
+        "duree_totale_secondes": 0.719,
+        "erreurs_http": {}
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "correction_test": null,
+          "decision": "report_bug",
+          "explication": "La route /commandes retourne toutes les commandes, alors qu’une pharmacie doit voir uniquement ses propres commandes, conformément à la règle métier supplémentaire : une pharmacie ne peut consulter que ses propres commandes.",
+          "preuve_decision": null,
+          "risques": []
+        },
+        "erreur_finale": null,
+        "nombre_appels": 3,
+        "duree_totale_secondes": 32.675,
+        "erreurs_http": {
+          "429": 2
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": null,
+        "erreur_finale": 429,
+        "nombre_appels": 4,
+        "duree_totale_secondes": 22.145,
+        "erreurs_http": {
+          "429": 3,
+          "400": 1
+        }
+      }
+    ],
+    "decision_finale": null,
+    "controle_preuve_decision": null
+  },
+  {
+    "scenario": "13",
+    "version": "multi-v3",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "termine",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "Remplacer la condition de vérification du stock par `if not stock or stock.quantite < data.quantite` afin d'autoriser une commande dont la quantité est exactement égale au stock disponible.",
+          "comportement_teste": "Le test `test_commande_egale_au_stock_disponible` échoue car la commande de quantité 10, égale au stock, est refusée.",
+          "regle_necessaire": "Une commande ne peut pas être refusée lorsqu’elle utilise exactement la totalité du stock disponible ; l’égalité doit être permise.",
+          "preuve_regle": "Règle métier supplémentaire : \"une pharmacie ne peut pas commander une quantité supérieure au stock disponible.\"",
+          "informations_manquantes": []
+        },
+        "erreur_finale": null,
+        "nombre_appels": 3,
+        "duree_totale_secondes": 22.127,
+        "erreurs_http": {
+          "429": 2
+        }
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "decision": "report_bug",
+          "explication": "Le code refuse une commande lorsque la quantité demandée est égale au stock disponible en utilisant la condition `stock.quantite <= data.quantite`. Selon la règle métier supplémentaire, une pharmacie ne peut pas commander une quantité supérieure au stock disponible, mais il n’y a aucune restriction sur une commande exactement égale au stock. Le test `test_commande_egale_au_stock_disponible` démontre que la commande de 10 unités (équivalent au stock) doit être acceptée, ce qui contredit le comportement actuel.",
+          "preuve_decision": "Règle métier supplémentaire : \"une pharmacie ne peut pas commander une quantité supérieure au stock disponible.\"",
+          "correction_test": null,
+          "risques": []
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 16.164,
+        "erreurs_http": {
+          "429": 1
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": {
+          "avis": "accept",
+          "motifs": [
+            "Contradiction entre la condition `stock.quantite <= data.quantite` et la règle métier supplémentaire autorisant une commande égale au stock disponible.",
+            "Le test `test_commande_egale_au_stock_disponible` valide que la commande de 10 unités doit être acceptée, ce qui n’est pas le cas avec la condition actuelle."
+          ],
+          "assertions_a_revoir": [],
+          "questions": []
+        },
+        "erreur_finale": null,
+        "nombre_appels": 4,
+        "duree_totale_secondes": 48.706,
+        "erreurs_http": {
+          "429": 2,
+          "400": 1
+        }
+      }
+    ],
+    "decision_finale": {
+      "decision_proposee": "report_bug",
+      "avis_verificateur": "accept",
+      "decision_effective": "needs_review",
+      "validation_humaine_requise": true
+    },
+    "controle_preuve_decision": {
+      "citation_presente": false,
+      "note": "Présence textuelle seulement ; pertinence et exactitude à vérifier humainement."
+    }
+  }
+]

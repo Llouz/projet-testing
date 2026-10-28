@@ -1,0 +1,179 @@
+[
+  {
+    "scenario": "11",
+    "version": "multi-v2",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "erreur",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "Le champ de requête a été renommé de `distributeur_id` à `fournisseur_id` dans la route `/commandes` sans mettre à jour les tests.",
+          "comportement_teste": "Les tests construisent un `CommandeRequest` avec le champ `distributeur_id` et s'attendent à ce que le code l'accepte, entraînant une validation Pydantic échouée.",
+          "regle_necessaire": "La signature de `CommandeRequest` doit conserver le champ `distributeur_id` (ou mettre à jour les tests) pour rester conforme au contrat d'API attendu par les clients.",
+          "preuve_regle": null,
+          "informations_manquantes": [
+            "Liste complète des tests ou spécifications client indiquant l'utilisation du champ `distributeur_id`."
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 1,
+        "duree_totale_secondes": 1.029,
+        "erreurs_http": {}
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "correction_test": null,
+          "decision": "needs_review",
+          "explication": "Le changement de nom du champ de requête (`distributeur_id` → `fournisseur_id`) n’est pas pris en compte par les tests, ce qui provoque une validation Pydantic échouée. La règle métier ne requiert pas que le nom du champ reste inchangé, mais le contrat d’API client le stipule. En l’état, l’implémentation ne respecte pas l’interface attendue par les tests existants. Il faut soit mettre à jour les tests pour utiliser le nouveau champ, soit restaurer le nom original pour rester compatible. Sans cette correction, les tests échoueront systématiquement. Cette situation requiert une révision avant de poursuivre.",
+          "risques": [
+            "perte de compatibilité API, erreurs de validation, échec du test suite, confusion pour les consommateurs d’API"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 32.82,
+        "erreurs_http": {
+          "429": 1
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": {},
+        "erreur_finale": 429,
+        "nombre_appels": 4,
+        "duree_totale_secondes": 68.012,
+        "erreurs_http": {
+          "429": 3,
+          "400": 1
+        }
+      }
+    ],
+    "decision_finale": null
+  },
+  {
+    "scenario": "12",
+    "version": "multi-v2",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "termine",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "La route voir_commandes renvoie toutes les commandes au lieu de filtrer par pharmacie_id.",
+          "comportement_teste": "La fonction voir_commandes, appelée avec pharmacie_id=1, retourne deux commandes alors que le test attend qu'elle ne retourne qu'une seule.",
+          "regle_necessaire": "Les commandes d'une pharmacie ne peuvent être lues que par cette pharmacie.",
+          "preuve_regle": null,
+          "informations_manquantes": [
+            "Aucune règle supplémentaire manquante"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 1,
+        "duree_totale_secondes": 0.75,
+        "erreurs_http": {}
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "decision": "repair_test",
+          "explication": "La fonction voir_commandes ne filtre pas les commandes par pharmacie_id, ce qui viole la règle métier supplémentaire selon laquelle une pharmacie ne peut consulter que ses propres commandes. Le test 'test_liste_commandes_limitee_a_la_pharmacie' révèle que deux commandes sont retournées alors qu’une seule doit être filtrée. La correction consiste à ajouter le filtre pharmacie_id dans la requête.",
+          "correction_test": "@pharmacie_router.get(\"/commandes\")\n def voir_commandes(db: Session = Depends(get_db), pharmacie_id: int = Depends(get_pharmacie_id)):\n-    return db.query(models.CommandePharmacie).all()\n+    return db.query(models.CommandePharmacie).filter_by(pharmacie_id=pharmacie_id).all()",
+          "risques": [
+            "Si la modification est introduite dans un code déjà déployé, un appel à /commandes pourrait devenir plus lent si le nombre de commandes est très élevé, mais le filtrage est nécessaire pour la conformité des données."
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 9.572,
+        "erreurs_http": {
+          "429": 1
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": {
+          "avis": "needs_review",
+          "motifs": [
+            "Le code de voir_commandes renvoie toutes les commandes au lieu de filtrer par pharmacie_id, ce qui viole la règle métier supplémentaire.",
+            "Le test fourni confirme ce comportement incorrect."
+          ],
+          "assertions_a_revoir": [
+            "La fonction voir_commandes doit être modifiée pour filtrer les commandes par pharmacie_id."
+          ],
+          "questions": [
+            "Y a-t-il d'autres points de l’API où la filtration par pharmacie_id est omise ?",
+            "Le filtre doit-il être appliqué dans les autres routes (par ex. confirmer-reception) déjà existantes ou uniquement dans voir_commandes ?"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 24.002,
+        "erreurs_http": {
+          "429": 1
+        }
+      }
+    ],
+    "decision_finale": {
+      "decision_proposee": "repair_test",
+      "avis_verificateur": "needs_review",
+      "validation_humaine_requise": true
+    }
+  },
+  {
+    "scenario": "13",
+    "version": "multi-v2",
+    "modele": "openai/gpt-oss-20b",
+    "statut": "erreur",
+    "agents": [
+      {
+        "role": "analyse",
+        "reponse": {
+          "changement": "Le code vérifie `stock.quantite <= data.quantite`, refusant la commande même lorsqu'on commande exactement la quantité disponible.",
+          "comportement_teste": "Dans le test `test_commande_egale_au_stock_disponible`, on demande 10 unités alors que le stock est de 10, mais l’exception 400 est levée, ce qui fait échouer le test.",
+          "regle_necessaire": "Règle métier supplémentaire : une pharmacie ne peut pas commander une quantité supérieure au stock disponible.",
+          "preuve_regle": "Règle métier supplémentaire : une pharmacie ne peut pas commander une quantité supérieure au stock disponible.",
+          "informations_manquantes": [
+            "Aucune information supplémentaire n’est requise pour expliquer l’échec du test."
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 3,
+        "duree_totale_secondes": 21.977,
+        "erreurs_http": {
+          "429": 2
+        }
+      },
+      {
+        "role": "decision",
+        "reponse": {
+          "decision": "repair_test",
+          "explication": "Le code refuse la commande quand la quantité demandée est exactement égale à la quantité en stock, alors que la règle métier autorise cette situation. Il faut modifier la condition pour ne rejeter que les quantités supérieures.",
+          "correction_test": "if not stock or stock.quantite < data.quantite:\n    raise HTTPException(status_code=400, detail=\"Stock insuffisant chez le distributeur\")",
+          "risques": [
+            "None"
+          ]
+        },
+        "erreur_finale": null,
+        "nombre_appels": 2,
+        "duree_totale_secondes": 21.186,
+        "erreurs_http": {
+          "429": 1
+        }
+      },
+      {
+        "role": "verification",
+        "reponse": {},
+        "erreur_finale": 429,
+        "nombre_appels": 4,
+        "duree_totale_secondes": 33.46,
+        "erreurs_http": {
+          "429": 3,
+          "400": 1
+        }
+      }
+    ],
+    "decision_finale": null
+  }
+]
