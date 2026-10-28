@@ -54,3 +54,7 @@ read -rs -p 'Clé Groq : ' GROQ_API_KEY; export GROQ_API_KEY; echo
 - Comment sont traitées les règles manquantes ? Un cas ambigu attend une revue humaine ; l'IA peut néanmoins se tromper.
 - Les résultats prouvent-ils l'efficacité générale ? Non : l'échantillon est réduit et les scénarios sont construits pour l'étude.
 - Quels coûts ? Quotas et temps d'appel sont observés ; les coûts et le temps humain complets restent à mesurer selon le fournisseur et la formule.
+
+## Comparaison avec le prototype multi-agents
+
+Après la présentation de la version à un modèle, utiliser `comparaison_approches.md` pour montrer les trois rôles, les résultats des scénarios 11 à 13 et leurs limites. Distinguer la décision proposée de la décision effective, et préciser que les durées affichées ne sont pas directement comparables. Le prototype ne répare pas automatiquement les tests.

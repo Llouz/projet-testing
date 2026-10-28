@@ -97,3 +97,7 @@ Les images ci-dessous sont des **reconstitutions visuelles de sorties et de donn
 7. Git, [Documentation](https://git-scm.com/doc), documentation de l'outil de gestion de versions. Le diff transmis dans cette expérimentation est actuellement construit avec Python.
 8. Binôme, journaux et scénarios du projet : dossiers `analyse_ia/` et `scenarios/`, comprenant les prompts, les réponses et les références d'évaluation.
 
+
+## Annexe — Comparaison des approches
+
+La branche multi-agents comprend une comparaison détaillée des résultats à un modèle et multi-agents dans [comparaison_approches.md](comparaison_approches.md). Les résultats multi-v3 sont expérimentaux et ne remplacent pas les résultats de la version à un modèle présentés ci-dessus.
